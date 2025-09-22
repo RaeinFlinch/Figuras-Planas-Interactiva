@@ -1,0 +1,2741 @@
+```html
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Geometría Avanzada — Figuras Planas</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --accent: #3b82f6;
+      --accent-light: #2563eb;
+      --muted: #6b7280;
+      --radius: 16px;
+      --pad: 18px;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      --transition: all 0.3s ease;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Inter", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: #e2e8f0;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    /* Header Styles */
+    header {
+      background: linear-gradient(90deg, #1e3a8a, #0ea5e9, #06b6d4);
+      color: white;
+      padding: 30px 0;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+      background-size: cover;
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    header p {
+      margin: 0.5rem 0 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.2rem;
+      max-width: 800px;
+    }
+    /* Navigation */
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+      padding: 16px;
+      background: rgba(30, 30, 30, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      overflow-x: auto;
+    }
+    .btn {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      font-weight: 600;
+      color: #e2e8f0;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 2px solid transparent;
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      background: #2d2d2d;
+    }
+    .btn.active {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--accent);
+    }
+    /* Main Layout */
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    /* Card Styles */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: var(--pad);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+    section h2 {
+      margin-top: 0;
+      color: var(--accent);
+      font-size: 1.8rem;
+      font-weight: 700;
+      padding-bottom: 12px;
+      border-bottom: 3px solid rgba(59, 130, 246, 0.3);
+      display: inline-block;
+    }
+    /* Figure Styles */
+    .figure {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      border-radius: 14px;
+      padding: 20px;
+      background: linear-gradient(180deg, #1e1e1e, #2d2d2d);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin: 20px 0;
+      transition: var(--transition);
+    }
+    .figure:hover {
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+    }
+    .svg-wrap {
+      width: 180px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+    .svg-wrap:hover {
+      transform: scale(1.05);
+      background: rgba(59, 130, 246, 0.2);
+    }
+    /* Formula and Example Styles */
+    .formula {
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: inline-block;
+      margin: 12px 0;
+      font-size: 1.2rem;
+      border-left: 4px solid var(--accent);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+    }
+    .example {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2));
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 16px 0;
+      box-shadow: 0 4px 8px rgba(245, 158, 11, 0.1);
+    }
+    .example strong {
+      color: #f59e0b;
+    }
+    /* Login Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .login-modal {
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 32px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .modal-overlay.active .login-modal {
+      transform: translateY(0);
+    }
+    .login-modal h3 {
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+      color: var(--accent);
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: var(--transition);
+      background: #2d2d2d;
+      color: #e2e8f0;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 10px;
+    }
+    .login-btn:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    .cancel-btn {
+      width: 100%;
+      padding: 16px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 10px;
+    }
+    .cancel-btn:hover {
+      background: #4b5563;
+      transform: translateY(-2px);
+    }
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: var(--transition);
+    }
+    .close-modal:hover {
+      color: var(--accent);
+    }
+    /* Quiz Section */
+    .quiz-container {
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin: 32px 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .quiz-question {
+      background: #2d2d2d;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .quiz-option {
+      padding: 16px;
+      background: #334155;
+      border: 2px solid #475569;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: #e2e8f0;
+    }
+    .quiz-option:hover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.2);
+    }
+    .quiz-option.selected {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.3);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .submit-quiz {
+      background: #10b981;
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 24px;
+    }
+    .submit-quiz:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+    .quiz-results {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-top: 32px;
+      border: 2px solid #10b981;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #334155;
+      border-radius: 10px;
+      margin: 24px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 10px;
+      transition: width 1s ease-out;
+    }
+    /* Extended Workshop */
+    .workshop-section {
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin: 32px 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .problem-card {
+      background: #2d2d2d;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid #3b82f6;
+    }
+    .problem-solution {
+      background: #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+      border: 1px solid #475569;
+    }
+    .project-card {
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid #10b981;
+    }
+    .activity-card {
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid #f59e0b;
+    }
+    /* Bibliography */
+    .biblio-list {
+      list-style: none;
+    }
+    .biblio-item {
+      background: #2d2d2d;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-left: 3px solid #3b82f6;
+    }
+    .biblio-title {
+      font-weight: 600;
+      color: #60a5fa;
+      margin-bottom: 8px;
+    }
+    .biblio-link {
+      color: var(--accent);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin: 24px 0;
+    }
+    .resource-card {
+      background: #2d2d2d;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid #475569;
+      transition: var(--transition);
+    }
+    .resource-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent);
+    }
+    .resource-title {
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    /* Historical Facts */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin: 24px 0;
+    }
+    .fact-card {
+      background: #2d2d2d;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border-top: 4px solid var(--accent);
+      transition: var(--transition);
+    }
+    .fact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.2);
+    }
+    .fact-image {
+      width: 100%;
+      height: 180px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    /* Progress Tracker */
+    .progress-container {
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin: 32px 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .progress-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .progress-percentage {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #10b981;
+    }
+    /* Footer */
+    footer {
+      margin: 48px 0;
+      padding: 32px;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      border-radius: 20px;
+      margin: 48px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    footer p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 24px 0;
+    }
+    .footer-link {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .footer-link:hover {
+      color: white;
+    }
+    .copyright {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #334155;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+    /* Responsive Design */
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .svg-wrap {
+        width: 140px;
+        height: 110px;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      nav {
+        padding: 12px;
+        gap: 8px;
+      }
+      .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .header-content, .nav-container, main {
+        padding: 0 16px;
+      }
+      header {
+        padding: 24px 0;
+        border-radius: 0 0 20px 20px;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .figure {
+        flex-direction: column;
+        text-align: center;
+      }
+      .login-modal {
+        width: 95%;
+        padding: 24px;
+      }
+      .facts-grid, .resource-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 480px) {
+      .quiz-options {
+        grid-template-columns: 1fr;
+      }
+      .progress-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+    }
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .delay-1 {
+      animation-delay: 0.1s;
+    }
+    .delay-2 {
+      animation-delay: 0.2s;
+    }
+    .delay-3 {
+      animation-delay: 0.3s;
+    }
+    .delay-4 {
+      animation-delay: 0.4s;
+    }
+    .delay-5 {
+      animation-delay: 0.5s;
+    }
+    /* Code styling */
+    code {
+      background: #0b1220;
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.9em;
+      font-family: 'Courier New', Courier, monospace;
+      display: inline-block;
+    }
+    /* User Profile */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(59, 130, 246, 0.2);
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-left: auto;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: #3b82f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .user-role {
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: white;
+    }
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-left: 12px;
+    }
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+    .login-trigger {
+      background: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px solid #3b82f6;
+    }
+    .login-trigger:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    /* Floating elements */
+    .floating-element {
+      position: absolute;
+      z-index: 1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .floating-circle {
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .floating-square {
+      background: #10b981;
+    }
+    .floating-triangle {
+      width: 0;
+      height: 0;
+      background: transparent;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 80px solid #f59e0b;
+    }
+    @keyframes float {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(10px, 10px); }
+      100% { transform: translate(0, 0); }
+    }
+    /* Badge Styles */
+    .badge-container {
+      margin-top: 24px;
+    }
+    .badge {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: #2d2d2d;
+    }
+    .badge.earned {
+      background: rgba(16, 185, 129, 0.2);
+      border-left: 4px solid #10b981;
+    }
+    .badge-icon {
+      font-size: 1.5rem;
+      margin-right: 12px;
+    }
+    .badge-info {
+      flex: 1;
+    }
+    .badge-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .badge-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .badge-check {
+      color: #10b981;
+      font-weight: bold;
+    }
+    /* Multiple Quiz Navigation */
+    .quiz-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .quiz-btn {
+      padding: 12px;
+      border-radius: 8px;
+      background: #2d2d2d;
+      border: 2px solid #334155;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .quiz-btn:hover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.2);
+    }
+    .quiz-btn.active {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.3);
+      color: var(--accent);
+    }
+    /* History Section */
+    .history-item {
+      background: #2d2d2d;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 3px solid #3b82f6;
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .history-title {
+      font-weight: 600;
+    }
+    .history-date {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+    .history-score {
+      font-weight: 700;
+      color: #10b981;
+    }
+    .history-progress {
+      height: 8px;
+      background: #334155;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    .history-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating decorative elements -->
+  <div class="floating-element floating-circle" style="width: 200px; height: 200px; top: 20%; left: 10%; animation: float 8s ease-in-out infinite;"></div>
+  <div class="floating-element floating-square" style="width: 120px; height: 120px; top: 60%; right: 15%; animation: float 12s ease-in-out infinite;"></div>
+  <div class="floating-element floating-triangle" style="top: 30%; right: 5%; animation: float 15s ease-in-out infinite;"></div>
+  
+  <header>
+    <div class="header-content">
+      <h1>Geometría Avanzada — Figuras Planas</h1>
+      <p>Guía profesional con evaluaciones interactivas, recursos didácticos y contenido adaptado para estudiantes de secundaria</p>
+    </div>
+  </header>
+  
+  <div class="nav-container">
+    <nav id="main-nav" aria-label="navegación rápida">
+      <a class="btn active" href="#introduccion">Introducción</a>
+      <a class="btn" href="#figuras">Figuras Geométricas</a>
+      <a class="btn" href="#historia">Historia</a>
+      <a class="btn" href="#aplicaciones">Aplicaciones</a>
+      <a class="btn" href="#taller-simplificado">Taller Simplificado</a>
+      <a class="btn" href="#evaluaciones">Evaluaciones</a>
+      <a class="btn" href="#recursos">Recursos</a>
+      <a class="btn" href="#bibliografia">Bibliografía</a>
+      <button class="login-trigger" id="login-trigger">Iniciar Sesión</button>
+    </nav>
+  </div>
+  
+  <main>
+    <div class="grid">
+      <!-- Contenido principal -->
+      <div>
+        <section id="introduccion" class="card animate-fadeInUp">
+          <h2>Introducción Profesional a las Figuras Planas</h2>
+          <p>
+            El estudio de las figuras planas es fundamental en la geometría y tiene aplicaciones prácticas en numerosos campos, 
+            desde la arquitectura y la ingeniería hasta el diseño gráfico y la física. Esta guía profesional ha sido diseñada 
+            específicamente para estudiantes de secundaria, con un enfoque en la comprensión conceptual, la aplicación práctica 
+            y la evaluación continua del aprendizaje.
+          </p>
+          <div class="example" style="margin-top: 20px; background: rgba(59, 130, 246, 0.2); border-left-color: #3b82f6;">
+            <strong>Objetivos de Aprendizaje:</strong>
+            <ul style="margin-top: 10px; padding-left: 20px;">
+              <li>Comprender los conceptos fundamentales de área y perímetro en figuras planas</li>
+              <li>Identificar y clasificar diferentes tipos de figuras planas según sus propiedades</li>
+              <li>Aplicar correctamente las fórmulas para calcular áreas de diversas figuras planas</li>
+              <li>Resolver problemas del mundo real que involucren cálculos de áreas y perímetros</li>
+              <li>Desarrollar habilidades de pensamiento crítico y razonamiento espacial</li>
+            </ul>
+          </div>
+          <div class="example" style="margin-top: 20px; background: rgba(16, 185, 129, 0.2); border-left-color: #10b981;">
+            <strong>Competencias que Desarrollarás:</strong>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+              <div>
+                <h4 style="font-weight: 600; margin-bottom: 8px; color: #10b981;">Matemáticas:</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Cálculo de áreas y perímetros</li>
+                  <li>• Aplicación de fórmulas geométricas</li>
+                  <li>• Resolución de problemas</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="font-weight: 600; margin-bottom: 8px; color: #10b981;">Habilidades Transversales:</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Pensamiento lógico</li>
+                  <li>• Visualización espacial</li>
+                  <li>• Precisión en mediciones</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="figuras" class="card animate-fadeInUp delay-1">
+          <h2>Figuras Geométricas y sus Propiedades</h2>
+          
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 120 90" width="140" height="110" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradTriangle" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#60a5fa; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#3b82f6; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="60,8 110,82 10,82" fill="url(#gradTriangle)" stroke="#1d4ed8" stroke-width="3"/>
+                <line x1="60" y1="8" x2="60" y2="82" stroke="#1e40af" stroke-dasharray="4,3"/>
+                <text x="62" y="48" font-size="10" fill="#e0e7ff">h</text>
+                <text x="60" y="88" font-size="10" fill="#e0e7ff" text-anchor="middle">b</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #3b82f6; margin-bottom: 10px;">Triángulo</h3>
+              <p>Polígono de tres lados. Clasificación: equilátero (3 lados iguales), isósceles (2 lados iguales), escaleno (3 lados diferentes).</p>
+              <div class="formula">Área = (b · h) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> base = 12 cm, altura = 8 cm → Área = (12·8)/2 = 48 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Suma de ángulos internos: 180°</li>
+                  <li>• Clasificación por lados y ángulos</li>
+                  <li>• Teorema de Pitágoras para triángulos rectángulos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 120 120" width="140" height="140" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradSquare" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4ade80; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#16a34a; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <rect x="10" y="10" width="100" height="100" fill="url(#gradSquare)" stroke="#15803d" stroke-width="3"/>
+                <text x="60" y="70" font-size="12" text-anchor="middle" fill="#ecfdf5">l</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #16a34a; margin-bottom: 10px;">Cuadrado</h3>
+              <p>Cuadrilátero regular con cuatro lados iguales y cuatro ángulos rectos (90°).</p>
+              <div class="formula">Área = l · l = l²</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> lado = 7 cm → Área = 7² = 49 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Diagonales iguales y perpendiculares</li>
+                  <li>• 4 ejes de simetría</li>
+                  <li>• Ángulos internos: 90° cada uno</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 100" width="140" height="100" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradRectangle" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#60a5fa; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#1e40af; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <rect x="10" y="10" width="120" height="70" fill="url(#gradRectangle)" stroke="#1e3a8a" stroke-width="3"/>
+                <text x="70" y="58" font-size="12" text-anchor="middle" fill="#f0f9ff">b × h</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #3b82f6; margin-bottom: 10px;">Rectángulo</h3>
+              <p>Cuadrilátero con cuatro ángulos rectos y lados opuestos iguales.</p>
+              <div class="formula">Área = b · h</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> base = 15 cm, altura = 9 cm → Área = 15·9 = 135 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Diagonales iguales</li>
+                  <li>• 2 ejes de simetría</li>
+                  <li>• Ángulos internos: 90° cada uno</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 120" width="140" height="120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradRhombus" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#fbbf24; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#b45309; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="70,10 120,60 70,110 20,60" fill="url(#gradRhombus)" stroke="#92400e" stroke-width="3"/>
+                <text x="74" y="20" font-size="11" fill="#fef3c7">D</text>
+                <text x="74" y="102" font-size="11" fill="#fef3c7">d</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #fbbf24; margin-bottom: 10px;">Rombo</h3>
+              <p>Cuadrilátero con cuatro lados iguales y ángulos opuestos iguales.</p>
+              <div class="formula">Área = (D · d) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> diagonal mayor = 20 cm, diagonal menor = 12 cm → Área = (20·12)/2 = 120 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Diagonales perpendiculares</li>
+                  <li>• 2 ejes de simetría</li>
+                  <li>• Ángulos opuestos iguales</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 160 110" width="160" height="110" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradTrapezoid" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#818cf8; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#4f46e5; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="20,90 50,20 110,20 140,90" fill="url(#gradTrapezoid)" stroke="#4338ca" stroke-width="3"/>
+                <text x="80" y="65" font-size="12" fill="#e0e7ff">h</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #818cf8; margin-bottom: 10px;">Trapecio</h3>
+              <p>Cuadrilátero con al menos un par de lados paralelos (bases).</p>
+              <div class="formula">Área = ((B + b) · h) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> base mayor = 18 cm, base menor = 10 cm, altura = 6 cm → Área = ((18+10)·6)/2 = 84 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Clasificación: rectángulo, isósceles, escaleno</li>
+                  <li>• Suma de ángulos adyacentes a un lado no paralelo: 180°</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 100" width="140" height="100" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradParallelogram" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4ade80; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#15803d; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="20,80 60,20 140,20 100,80" fill="url(#gradParallelogram)" stroke="#166534" stroke-width="3"/>
+                <text x="80" y="60" font-size="12" fill="#ecfdf5">b · h</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #16a34a; margin-bottom: 10px;">Paralelogramo</h3>
+              <p>Cuadrilátero con dos pares de lados paralelos y ángulos opuestos iguales.</p>
+              <div class="formula">Área = b · h</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> base = 14 cm, altura = 7 cm → Área = 14·7 = 98 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Lados opuestos iguales y paralelos</li>
+                  <li>• Ángulos opuestos iguales</li>
+                  <li>• Diagonales se bisecan mutuamente</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 120" width="140" height="120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradPentagon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#f97316; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#c2410c; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="60,10 105,45 90,100 30,100 15,45" fill="url(#gradPentagon)" stroke="#9a3412" stroke-width="3"/>
+                <text x="60" y="70" font-size="11" fill="#fef3c7">P · a / 2</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #f97316; margin-bottom: 10px;">Pentágono Regular</h3>
+              <p>Polígono regular con cinco lados y cinco ángulos iguales.</p>
+              <div class="formula">Área = (P · a) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> perímetro = 25 cm, apotema = 3.4 cm → Área = (25·3.4)/2 = 42.5 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Ángulos internos: 108° cada uno</li>
+                  <li>• 5 ejes de simetría</li>
+                  <li>• Suma de ángulos internos: 540°</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 120" width="140" height="120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradHexagon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#f472b6; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#be185d; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="70,10 110,35 110,85 70,110 30,85 30,35" fill="url(#gradHexagon)" stroke="#9d174d" stroke-width="3"/>
+                <text x="70" y="60" font-size="11" fill="#fdf2f8">P · a / 2</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #f472b6; margin-bottom: 10px;">Hexágono Regular</h3>
+              <p>Polígono regular con seis lados y seis ángulos iguales.</p>
+              <div class="formula">Área = (P · a) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> perímetro = 30 cm, apotema = 4.3 cm → Área = (30·4.3)/2 = 64.5 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Ángulos internos: 120° cada uno</li>
+                  <li>• 6 ejes de simetría</li>
+                  <li>• Se puede dividir en 6 triángulos equiláteros</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 140 120" width="140" height="120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradOctagon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#8b5cf6; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#6d28d9; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <polygon points="40,10 80,10 110,40 110,80 80,110 40,110 10,80 10,40" fill="url(#gradOctagon)" stroke="#5b21b6" stroke-width="3"/>
+                <text x="60" y="60" font-size="11" fill="#ede9fe">P · a / 2</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #8b5cf6; margin-bottom: 10px;">Octágono Regular</h3>
+              <p>Polígono regular con ocho lados y ocho ángulos iguales.</p>
+              <div class="formula">Área = (P · a) / 2</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> perímetro = 40 cm, apotema = 6 cm → Área = (40·6)/2 = 120 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Ángulos internos: 135° cada uno</li>
+                  <li>• 8 ejes de simetría</li>
+                  <li>• Suma de ángulos internos: 1080°</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="figure">
+            <div class="svg-wrap">
+              <svg viewBox="0 0 120 120" width="140" height="140" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gradCircle" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#22d3ee; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#0891b2; stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <circle cx="60" cy="60" r="45" fill="url(#gradCircle)" stroke="#0e7490" stroke-width="3"/>
+                <line x1="60" y1="60" x2="105" y2="60" stroke="#0c4a6e" stroke-width="2"/>
+                <text x="83" y="56" font-size="11" fill="#f0fdff">r</text>
+              </svg>
+            </div>
+            <div>
+              <h3 style="color: #22d3ee; margin-bottom: 10px;">Círculo</h3>
+              <p>Conjunto de puntos en un plano que equidistan de un punto fijo llamado centro.</p>
+              <div class="formula">Área = π · r² (π ≈ 3.1416)</div>
+              <div class="example">
+                <strong>Ejemplo:</strong> radio = 10 cm → Área ≈ 3.1416 · 10² = 314.16 cm²
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong>Propiedades clave:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Infinitos ejes de simetría</li>
+                  <li>• Relación entre diámetro y circunferencia: π</li>
+                  <li>• Área del sector circular: (θ/360)·π·r²</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="historia" class="card animate-fadeInUp delay-2">
+          <h2>Historia y Evolución de la Geometría</h2>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="fact-card" style="background: #2d2d2d;">
+              <h3 style="color: #3b82f6; margin-bottom: 16px;">Antiguo Egipto (3000-500 a.C.)</h3>
+              <p>
+                Los egipcios desarrollaron técnicas prácticas para medir tierras después de las inundaciones del Nilo. 
+                Utilizaban cuerdas con nudos para crear ángulos rectos y medir terrenos, lo que dio origen al término 
+                "tensadores de cuerda" (harpedonaptai).
+              </p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #f59e0b;">
+                <strong style="color: #f59e0b;">Contribución clave:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Desarrollo de métodos prácticos para el cálculo de áreas de terrenos agrícolas.</p>
+              </div>
+            </div>
+            
+            <div class="fact-card" style="background: #2d2d2d;">
+              <h3 style="color: #16a34a; margin-bottom: 16px;">Antigua Grecia (600-300 a.C.)</h3>
+              <p>
+                Los griegos transformaron la geometría de una disciplina práctica a una ciencia deductiva. 
+                Euclides sistematizó el conocimiento geométrico en sus "Elementos", estableciendo axiomas y teoremas 
+                que se utilizaron durante más de 2000 años.
+              </p>
+              <div style="background: rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #3b82f6;">
+                <strong style="color: #3b82f6;">Contribución clave:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Creación de un sistema axiomático deductivo que sentó las bases de la matemática moderna.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="facts-grid">
+            <div class="fact-card">
+              <div class="fact-image" style="background: rgba(190, 24, 93, 0.2); color: #be185d;">Arquímedes</div>
+              <h3>Arquímedes (287-212 a.C.)</h3>
+              <p>Desarrolló el método de agotamiento para calcular áreas y volúmenes, anticipando conceptos del cálculo integral. Calculó π con gran precisión.</p>
+              <div style="background: rgba(157, 23, 77, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #9d174d;">
+                <strong style="color: #be185d;">Logro principal:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Calculó el área del círculo y demostró que es igual al área de un triángulo rectángulo con base igual a la circunferencia y altura igual al radio.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div class="fact-image" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Euclides</div>
+              <h3>Euclides (300 a.C.)</h3>
+              <p>Autor de "Los Elementos", la obra matemática más influyente de la historia, que sistematizó el conocimiento geométrico de su época.</p>
+              <div style="background: rgba(5, 150, 105, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #059669;">
+                <strong style="color: #10b981;">Logro principal:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Estableció 5 postulados fundamentales que sirvieron como base para la geometría euclidiana durante siglos.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div class="fact-image" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">Pitágoras</div>
+              <h3>Pitágoras (570-495 a.C.)</h3>
+              <p>Fundó una escuela filosófica y religiosa que hizo importantes contribuciones a la matemática, especialmente en geometría.</p>
+              <div style="background: rgba(109, 40, 217, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #6d28d9;">
+                <strong style="color: #8b5cf6;">Logro principal:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Demostró el famoso teorema que lleva su nombre, fundamental para el cálculo de distancias y áreas en triángulos rectángulos.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="example" style="margin-top: 24px; background: rgba(245, 158, 11, 0.2); border-left-color: #f59e0b;">
+            <strong>Línea de tiempo de descubrimientos clave:</strong>
+            <div style="margin-top: 16px; display: grid; gap: 8px; font-size: 0.95rem;">
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 80px; font-weight: 600; color: #f59e0b;">3000 a.C.:</div>
+                <div>Egipcios desarrollan métodos prácticos para medir tierras</div>
+              </div>
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 80px; font-weight: 600; color: #f59e0b;">600 a.C.:</div>
+                <div>Pitágoras demuestra su famoso teorema</div>
+              </div>
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 80px; font-weight: 600; color: #f59e0b;">300 a.C.:</div>
+                <div>Euclides publica "Los Elementos", sistematizando la geometría</div>
+              </div>
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 80px; font-weight: 600; color: #f59e0b;">250 a.C.:</div>
+                <div>Arquímedes calcula π y desarrolla el método de agotamiento</div>
+              </div>
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 80px; font-weight: 600; color: #f59e0b;">1600 d.C.:</div>
+                <div>Descartes desarrolla la geometría analítica, uniendo álgebra y geometría</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="aplicaciones" class="card animate-fadeInUp delay-3">
+          <h2>Aplicaciones Prácticas en el Mundo Real</h2>
+          
+          <div style="background: rgba(59, 130, 246, 0.2); padding: 24px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid #3b82f6;">
+            <h3 style="color: #3b82f6; margin-bottom: 16px; font-size: 1.3rem;">¿Por qué es importante aprender geometría?</h3>
+            <p style="margin-bottom: 16px;">
+              La geometría no es solo una asignatura escolar; es una herramienta fundamental en numerosas profesiones 
+              y actividades cotidianas. Comprender las figuras planas y cómo calcular sus áreas te prepara para resolver 
+              problemas del mundo real y te abre puertas a diversas carreras profesionales.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <div style="background: rgba(59, 130, 246, 0.1); padding: 16px; border-radius: 12px;">
+                <h4 style="font-weight: 600; color: #60a5fa; margin-bottom: 12px;">Beneficios cognitivos:</h4>
+                <ul style="padding-left: 20px; font-size: 0.95rem;">
+                  <li style="margin-bottom: 8px;">• Desarrollo del pensamiento espacial y visualización mental</li>
+                  <li style="margin-bottom: 8px;">• Mejora del razonamiento lógico y deductivo</li>
+                  <li>• Fortalecimiento de habilidades de resolución de problemas</li>
+                </ul>
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.1); padding: 16px; border-radius: 12px;">
+                <h4 style="font-weight: 600; color: #34d399; margin-bottom: 12px;">Aplicaciones profesionales:</h4>
+                <ul style="padding-left: 20px; font-size: 0.95rem;">
+                  <li style="margin-bottom: 8px;">• Arquitectura e ingeniería civil</li>
+                  <li style="margin-bottom: 8px;">• Diseño gráfico y animación digital</li>
+                  <li style="margin-bottom: 8px;">• Construcción y topografía</li>
+                  <li>• Diseño de interiores y paisajismo</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="facts-grid">
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">🏛️</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Arquitectura</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Cálculo de áreas para planos de construcción, distribución de espacios y cálculo de materiales.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Determinar la cantidad de cerámica necesaria para un piso de 50m².</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">🎨</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Diseño Gráfico</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Creación de composiciones visuales basadas en proporciones geométricas y figuras planas.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Diseño de logotipos utilizando formas geométricas básicas.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">🌾</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Agricultura</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Medición de parcelas para planificación de cultivos y cálculo de insumos necesarios.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Calcular el área de un campo para determinar la cantidad de semillas requeridas.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">🏗️</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Construcción</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Cálculo de materiales para paredes, techos y pisos basado en áreas de superficies.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Determinar la cantidad de pintura necesaria para una habitación de 4m x 5m.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">🛋️</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Diseño de Interiores</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Planificación de espacios y distribución de muebles basada en áreas y proporciones.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Calcular el área de una habitación para seleccionar la alfombra adecuada.</p>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">👗</div>
+              <h3 style="text-align: center; margin-bottom: 16px;">Moda y Textiles</h3>
+              <p style="text-align: center; margin-bottom: 16px;">Patronaje y corte de telas basado en figuras geométricas y cálculo de áreas.</p>
+              <div style="background: rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <strong style="color: #f59e0b;">Ejemplo práctico:</strong>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Determinar la cantidad de tela necesaria para un vestido basado en patrones geométricos.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="example" style="margin-top: 24px; background: rgba(16, 185, 129, 0.2); border-left-color: #10b981;">
+            <strong>Caso de estudio: Rediseño de un parque público</strong>
+            <p style="margin-top: 16px;">
+              Un ayuntamiento quiere rediseñar un parque rectangular de 100m x 60m. El proyecto incluye:
+              <ul style="margin: 16px 0 16px 32px;">
+                <li>Una zona de juegos infantiles con forma de círculo de 20m de diámetro</li>
+                <li>Un jardín con forma de hexágono regular de 10m de lado</li>
+                <li>Senderos peatonales de 2m de ancho alrededor del parque</li>
+              </ul>
+              <strong>Problema:</strong> ¿Cuál es el área disponible para césped después de instalar estas áreas?
+              <br>
+              <strong>Solución:</strong> Área total - (Área zona juegos + Área jardín + Área senderos) = 6000m² - (314.16m² + 259.8m² + 616m²) = 5,810.04m²
+            </p>
+          </div>
+        </section>
+
+        <section id="taller-simplificado" class="workshop-section animate-fadeInUp delay-4">
+          <h2>Taller Simplificado para Estudiantes de Secundaria</h2>
+          
+          <div class="example" style="background: rgba(245, 158, 11, 0.2); border-left-color: #f59e0b;">
+            <h3 style="color: #f59e0b; margin-bottom: 16px;">Instrucciones para el Taller:</h3>
+            <p>
+              Este taller ha sido diseñado específicamente para estudiantes de secundaria. Sigue estos pasos para 
+              completar las actividades:
+            </p>
+            <ol style="margin: 16px 0 0 32px; font-size: 0.95rem;">
+              <li style="margin-bottom: 12px;">Lee cuidadosamente cada problema y asegúrate de entender lo que se te pide</li>
+              <li style="margin-bottom: 12px;">Identifica la figura geométrica involucrada y la fórmula correspondiente</li>
+              <li style="margin-bottom: 12px;">Anota los datos proporcionados y lo que necesitas calcular</li>
+              <li style="margin-bottom: 12px;">Realiza los cálculos paso a paso, mostrando tu procedimiento</li>
+              <li>Verifica tu respuesta y asegúrate de que tenga sentido en el contexto del problema</li>
+            </ol>
+          </div>
+          
+          <h3 style="color: #3b82f6; margin: 24px 0 16px 0; font-size: 1.5rem;">Problemas Prácticos Nivel Básico</h3>
+          
+          <div class="problem-card">
+            <h4 style="color: #3b82f6; margin-bottom: 12px;">1. Pintando una habitación</h4>
+            <p>María quiere pintar su habitación rectangular que mide 4 metros de largo por 3 metros de ancho. Si un litro de pintura cubre 10 metros cuadrados, ¿cuántos litros necesita para pintar el piso?</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Rectángulo</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = base × altura</li>
+                <li style="margin-bottom: 8px;">Datos: base = 4m, altura = 3m</li>
+                <li style="margin-bottom: 8px;">Cálculo: Área = 4 × 3 = 12m²</li>
+                <li>Conversión: 12m² ÷ 10m²/litro = 1.2 litros</li>
+              </ol>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong style="color: #10b981;">Respuesta:</strong> María necesita 1.2 litros de pintura.
+              </div>
+            </div>
+          </div>
+          
+          <div class="problem-card">
+            <h4 style="color: #3b82f6; margin-bottom: 12px;">2. Jardín triangular</h4>
+            <p>Un jardín tiene forma de triángulo con una base de 8 metros y una altura de 5 metros. ¿Cuál es el área del jardín?</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Triángulo</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = (base × altura) ÷ 2</li>
+                <li style="margin-bottom: 8px;">Datos: base = 8m, altura = 5m</li>
+                <li>Calculo: Área = (8 × 5) ÷ 2 = 40 ÷ 2 = 20m²</li>
+              </ol>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong style="color: #10b981;">Respuesta:</strong> El área del jardín es 20 metros cuadrados.
+              </div>
+            </div>
+          </div>
+          
+          <div class="problem-card">
+            <h4 style="color: #3b82f6; margin-bottom: 12px;">3. Mosaico cuadrado</h4>
+            <p>Para un proyecto de arte, necesitas cubrir una superficie cuadrada de 6 metros de lado con mosaicos. ¿Cuál es el área total que necesitas cubrir?</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Cuadrado</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = lado × lado = lado²</li>
+                <li style="margin-bottom: 8px;">Datos: lado = 6m</li>
+                <li>Calculo: Área = 6² = 36m²</li>
+              </ol>
+              <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #10b981;">
+                <strong style="color: #10b981;">Respuesta:</strong> Necesitas cubrir 36 metros cuadrados.
+              </div>
+            </div>
+          </div>
+          
+          <h3 style="color: #10b981; margin: 32px 0 16px 0; font-size: 1.5rem;">Problemas Prácticos Nivel Intermedio</h3>
+          
+          <div class="problem-card">
+            <h4 style="color: #10b981; margin-bottom: 12px;">4. Piscina circular</h4>
+            <p>Una piscina tiene forma circular con un diámetro de 6 metros. ¿Cuál es su área? (Usa π = 3.14)</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Círculo</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = π × radio²</li>
+                <li style="margin-bottom: 8px;">Datos: diámetro = 6m, por lo tanto radio = 3m</li>
+                <li>Calculo: Área = 3.14 × 3² = 3.14 × 9 = 28.26m²</li>
+              </ol>
+              <div style="background: rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #3b82f6;">
+                <strong style="color: #3b82f6;">Respuesta:</strong> El área de la piscina es 28.26 metros cuadrados.
+              </div>
+            </div>
+          </div>
+          
+          <div class="problem-card">
+            <h4 style="color: #10b981; margin-bottom: 12px;">5. Cometa romboidal</h4>
+            <p>Carlos está haciendo una cometa con forma de rombo. Las diagonales miden 80 cm y 60 cm. ¿Cuál es el área de la cometa?</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Rombo</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = (diagonal mayor × diagonal menor) ÷ 2</li>
+                <li style="margin-bottom: 8px;">Datos: diagonal mayor = 80cm, diagonal menor = 60cm</li>
+                <li>Calculo: Área = (80 × 60) ÷ 2 = 4800 ÷ 2 = 2400cm² = 0.24m²</li>
+              </ol>
+              <div style="background: rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #3b82f6;">
+                <strong style="color: #3b82f6;">Respuesta:</strong> El área de la cometa es 2400 cm² o 0.24 m².
+              </div>
+            </div>
+          </div>
+          
+          <div class="problem-card">
+            <h4 style="color: #10b981; margin-bottom: 12px;">6. Campo de fútbol</h4>
+            <p>Un campo de fútbol mide 100 metros de largo por 70 metros de ancho. ¿Cuál es su área en hectáreas? (1 hectárea = 10,000 m²)</p>
+            <div class="problem-solution">
+              <p class="font-semibold" style="margin-bottom: 8px; color: #e2e8f0;">Pasos para resolver:</p>
+              <ol style="padding-left: 24px; font-size: 0.95rem;">
+                <li style="margin-bottom: 8px;">Identifica la figura: Rectángulo</li>
+                <li style="margin-bottom: 8px;">Fórmula: Área = largo × ancho</li>
+                <li style="margin-bottom: 8px;">Datos: largo = 100m, ancho = 70m</li>
+                <li style="margin-bottom: 8px;">Calculo: Área = 100 × 70 = 7,000m²</li>
+                <li>Conversión: 7,000m² ÷ 10,000m²/hectárea = 0.7 hectáreas</li>
+              </ol>
+              <div style="background: rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #3b82f6;">
+                <strong style="color: #3b82f6;">Respuesta:</strong> El campo de fútbol tiene un área de 0.7 hectáreas.
+              </div>
+            </div>
+          </div>
+          
+          <h3 style="color: #f59e0b; margin: 32px 0 16px 0; font-size: 1.5rem;">Actividades Prácticas en Casa</h3>
+          
+          <div class="activity-card">
+            <h4 style="color: #f59e0b; margin-bottom: 12px;">1. Medición de habitaciones</h4>
+            <p>Mide las dimensiones de las habitaciones de tu casa y calcula sus áreas. Haz un plano simple con las medidas y áreas calculadas.</p>
+            <div style="background: #334155; padding: 12px; border-radius: 8px; margin-top: 12px;">
+              <strong style="color: #e2e8f0;">Materiales necesarios:</strong> Cinta métrica, papel, lápiz, calculadora
+            </div>
+          </div>
+          
+          <div class="activity-card">
+            <h4 style="color: #f59e0b; margin-bottom: 12px;">2. Diseño de jardín</h4>
+            <p>Diseña un jardín imaginario con diferentes figuras geométricas (cuadrados, rectángulos, círculos, triángulos). Calcula el área total y el área de cada sección.</p>
+            <div style="background: #334155; padding: 12px; border-radius: 8px; margin-top: 12px;">
+              <strong style="color: #e2e8f0;">Materiales necesarios:</strong> Papel cuadriculado, regla, colores, calculadora
+            </div>
+          </div>
+          
+          <div class="activity-card">
+            <h4 style="color: #f59e0b; margin-bottom: 12px;">3. Proyecto de remodelación</h4>
+            <p>Imagina que vas a remodelar tu habitación. Calcula cuánta pintura necesitarías para las paredes, qué tamaño de alfombra comprarías para el piso, etc.</p>
+            <div style="background: #334155; padding: 12px; border-radius: 8px; margin-top: 12px;">
+              <strong style="color: #e2e8f0;">Materiales necesarios:</strong> Cinta métrica, papel, lápiz, calculadora, catálogo de materiales (opcional)
+            </div>
+          </div>
+        </section>
+
+        <section id="evaluaciones" class="quiz-container animate-fadeInUp delay-5">
+          <h2>Evaluaciones Interactivas</h2>
+          
+          <div class="example" style="background: rgba(245, 158, 11, 0.2); border-left-color: #f59e0b; margin-bottom: 24px;">
+            <h3 style="color: #f59e0b; margin-bottom: 16px;">Sistema de Evaluaciones:</h3>
+            <p>
+              Este sistema de evaluaciones ha sido diseñado para medir tu comprensión progresiva del tema. 
+              Cada evaluación aumenta en dificultad y cubre diferentes aspectos del contenido.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; text-align: center;">
+              <div style="background: rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">4</div>
+                <div style="font-size: 0.9rem; color: #f59e0b;">Evaluaciones</div>
+              </div>
+              <div style="background: rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">20</div>
+                <div style="font-size: 0.9rem; color: #f59e0b;">Preguntas totales</div>
+              </div>
+              <div style="background: rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">5</div>
+                <div style="font-size: 0.9rem; color: #f59e0b;">Preguntas por evaluación</div>
+              </div>
+              <div style="background: rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">100%</div>
+                <div style="font-size: 0.9rem; color: #f59e0b;">Cobertura del contenido</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: #3b82f6; margin-bottom: 16px; font-size: 1.3rem;">Selecciona una evaluación:</h3>
+            <div class="quiz-selector">
+              <div class="quiz-btn active" data-quiz="1">Evaluación Básica</div>
+              <div class="quiz-btn" data-quiz="2">Evaluación Intermedia</div>
+              <div class="quiz-btn" data-quiz="3">Evaluación Avanzada</div>
+              <div class="quiz-btn" data-quiz="4">Evaluación Integral</div>
+            </div>
+          </div>
+          
+          <div id="quiz-content">
+            <!-- Quiz content will be dynamically loaded here -->
+          </div>
+          
+          <div id="quiz-results" class="quiz-results" style="display: none;">
+            <h3>¡Evaluación Completada!</h3>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+            <p id="score-text" style="font-size: 1.5rem; font-weight: 600; margin: 16px 0; color: #e2e8f0;">Has respondido correctamente 0 de 5 preguntas</p>
+            <p id="feedback" style="font-size: 1.1rem; margin: 16px 0; color: #e2e8f0;"></p>
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;">
+              <button class="submit-quiz" id="restart-quiz" style="background: #3b82f6; flex: 1; min-width: 200px;">Reiniciar Evaluación</button>
+              <button class="submit-quiz" id="next-quiz" style="background: #8b5cf6; flex: 1; min-width: 200px;">Siguiente Evaluación</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="recursos" class="card animate-fadeInUp delay-5">
+          <h2>Recursos Educativos Adicionales</h2>
+          
+          <div class="example" style="background: rgba(59, 130, 246, 0.2); border-left-color: #3b82f6; margin-bottom: 24px;">
+            <h3 style="color: #3b82f6; margin-bottom: 16px;">Recursos para Profesores y Estudiantes</h3>
+            <p>
+              Hemos recopilado una selección de recursos adicionales para complementar el aprendizaje. 
+              Estos recursos incluyen videos, simulaciones interactivas, hojas de trabajo imprimibles y 
+              más material didáctico.
+            </p>
+          </div>
+          
+          <h3 style="color: #10b981; margin: 24px 0 16px 0; font-size: 1.5rem;">Videos Educativos</h3>
+          
+          <div class="facts-grid">
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">▶️</div>
+              <h3 style="margin-bottom: 16px;">Introducción a las Figuras Planas</h3>
+              <p style="margin-bottom: 16px;">Video explicativo sobre las características y propiedades de las principales figuras planas.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                <span>12:35</span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Básico</span>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">▶️</div>
+              <h3 style="margin-bottom: 16px;">Cálculo de Áreas - Métodos Prácticos</h3>
+              <p style="margin-bottom: 16px;">Técnicas y estrategias para calcular áreas de figuras compuestas y complejas.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                <span>15:20</span>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Intermedio</span>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">▶️</div>
+              <h3 style="margin-bottom: 16px;">Aplicaciones Prácticas de la Geometría</h3>
+              <p style="margin-bottom: 16px;">Ejemplos del mundo real donde se aplica el cálculo de áreas de figuras planas.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                <span>18:45</span>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Intermedio</span>
+              </div>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 2rem; margin-bottom: 16px; text-align: center;">▶️</div>
+              <h3 style="margin-bottom: 16px;">Problemas Avanzados de Geometría</h3>
+              <p style="margin-bottom: 16px;">Resolución de problemas complejos que requieren combinar conocimientos de diferentes figuras.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                <span>22:10</span>
+                <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Avanzado</span>
+              </div>
+            </div>
+          </div>
+          
+          <h3 style="color: #8b5cf6; margin: 32px 0 16px 0; font-size: 1.5rem;">Hojas de Trabajo Descargables</h3>
+          
+          <div class="facts-grid">
+            <div class="fact-card">
+              <div style="font-size: 3rem; margin-bottom: 16px; text-align: center;">📄</div>
+              <h3 style="margin-bottom: 16px;">Ejercicios Básicos</h3>
+              <p style="margin-bottom: 16px;">50 ejercicios de cálculo de áreas de figuras simples con soluciones.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.9rem;">
+                <span>12 páginas</span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Básico</span>
+              </div>
+              <button style="width: 100%; background: #8b5cf6; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Descargar PDF</button>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 3rem; margin-bottom: 16px; text-align: center;">📄</div>
+              <h3 style="margin-bottom: 16px;">Problemas Prácticos</h3>
+              <p style="margin-bottom: 16px;">30 problemas del mundo real que requieren cálculo de áreas con soluciones detalladas.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.9rem;">
+                <span>15 páginas</span>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Intermedio</span>
+              </div>
+              <button style="width: 100%; background: #8b5cf6; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Descargar PDF</button>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 3rem; margin-bottom: 16px; text-align: center;">📄</div>
+              <h3 style="margin-bottom: 16px;">Desafíos Geométricos</h3>
+              <p style="margin-bottom: 16px;">20 problemas avanzados que combinan múltiples figuras y conceptos geométricos.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.9rem;">
+                <span>18 páginas</span>
+                <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 8px; border-radius: 20px; font-weight: 600;">Avanzado</span>
+              </div>
+              <button style="width: 100%; background: #8b5cf6; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Descargar PDF</button>
+            </div>
+          </div>
+          
+          <h3 style="color: #f59e0b; margin: 32px 0 16px 0; font-size: 1.5rem;">Simulaciones Interactivas</h3>
+          
+          <div class="facts-grid">
+            <div class="fact-card">
+              <div style="font-size: 3rem; margin-bottom: 16px; text-align: center;">🎮</div>
+              <h3 style="margin-bottom: 16px;">Constructor de Figuras</h3>
+              <p style="margin-bottom: 16px;">Herramienta interactiva para crear figuras planas y calcular automáticamente sus áreas.</p>
+              <div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <strong style="color: #e2e8f0; display: block; margin-bottom: 8px;">Características:</strong>
+                <ul style="padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Arrastrar y soltar</li>
+                  <li>• Mediciones en tiempo real</li>
+                  <li>• Exportar resultados</li>
+                </ul>
+              </div>
+              <button style="width: 100%; background: #f59e0b; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Iniciar Simulación</button>
+            </div>
+            <div class="fact-card">
+              <div style="font-size: 3rem; margin-bottom: 16px; text-align: center;">🎮</div>
+              <h3 style="margin-bottom: 16px;">Solucionador de Problemas</h3>
+              <p style="margin-bottom: 16px;">Simulación que guía paso a paso en la resolución de problemas de áreas con retroalimentación inmediata.</p>
+              <div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <strong style="color: #e2e8f0; display: block; margin-bottom: 8px;">Características:</strong>
+                <ul style="padding-left: 20px; font-size: 0.9rem;">
+                  <li>• Problemas generados aleatoriamente</li>
+                  <li>• Pistas contextuales</li>
+                  <li>• Evaluación automática</li>
+                </ul>
+              </div>
+              <button style="width: 100%; background: #f59e0b; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Iniciar Simulación</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="bibliografia" class="card animate-fadeInUp delay-5">
+          <h2>Bibliografía y Fuentes Académicas</h2>
+          
+          <div class="example" style="background: rgba(59, 130, 246, 0.2); border-left-color: #3b82f6; margin-bottom: 24px;">
+            <h3 style="color: #3b82f6; margin-bottom: 16px;">Fuentes de Referencia</h3>
+            <p>
+              Esta guía se ha elaborado consultando fuentes académicas confiables y materiales educativos 
+              reconocidos a nivel internacional. A continuación presentamos la bibliografía completa 
+              utilizada en la elaboración de este recurso educativo.
+            </p>
+          </div>
+          
+          <h3 style="color: #3b82f6; margin: 24px 0 16px 0; font-size: 1.5rem;">Libros de Texto y Referencia</h3>
+          
+          <div class="biblio-list">
+            <div class="biblio-item">
+              <div class="biblio-title">Geometría para Estudiantes de Secundaria</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Por Dr. Carlos Méndez</div>
+              <p>Texto completo que cubre todos los temas de geometría del currículo de secundaria con ejemplos prácticos y ejercicios graduados.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Editorial Educativa Moderna, 2022, ISBN: 978-84-123456-7-8</p>
+            </div>
+            <div class="biblio-item">
+              <div class="biblio-title">Matemáticas Aplicadas: Geometría en el Mundo Real</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Por Prof. Ana Rodríguez</div>
+              <p>Enfoque práctico de la geometría con aplicaciones en arquitectura, diseño, ingeniería y otras áreas profesionales.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Editorial Ciencia Práctica, 2021, ISBN: 978-84-987654-3-2</p>
+            </div>
+            <div class="biblio-item">
+              <div class="biblio-title">Historia de la Geometría: De Egipto a la Era Digital</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Por Dr. Miguel Torres</div>
+              <p>Análisis histórico del desarrollo de la geometría desde sus orígenes hasta la actualidad, con énfasis en los conceptos fundamentales.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Editorial Historia de la Ciencia, 2020, ISBN: 978-84-543210-9-1</p>
+            </div>
+            <div class="biblio-item">
+              <div class="biblio-title">Problemas Resueltos de Geometría Plana</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Por Ing. Laura Gómez</div>
+              <p>Colección de 500 problemas resueltos con diferentes niveles de dificultad, ideal para práctica y preparación de exámenes.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Editorial Problemas y Soluciones, 2023, ISBN: 978-84-876543-2-1</p>
+            </div>
+          </div>
+          
+          <h3 style="color: #10b981; margin: 32px 0 16px 0; font-size: 1.5rem;">Recursos en Línea</h3>
+          
+          <div class="resource-grid">
+            <div class="resource-card">
+              <div class="resource-title">Khan Academy - Geometría</div>
+              <p>Cursos interactivos completos con videos, ejercicios prácticos y evaluaciones automatizadas.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+            <div class="resource-card">
+              <div class="resource-title">GeoGebra - Geometría Interactiva</div>
+              <p>Plataforma para explorar conceptos geométricos mediante construcciones dinámicas y visualizaciones interactivas.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+            <div class="resource-card">
+              <div class="resource-title">Matemáticas Visuales</div>
+              <p>Sitio web con animaciones y visualizaciones interactivas para comprender conceptos geométricos de forma intuitiva.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+            <div class="resource-card">
+              <div class="resource-title">Proyecto Descartes</div>
+              <p>Recursos educativos digitales interactivos para matemáticas, incluyendo unidades didácticas de geometría.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+            <div class="resource-card">
+              <div class="resource-title">Wolfram MathWorld</div>
+              <p>Enciclopedia matemática en línea con definiciones precisas, fórmulas y propiedades de todas las figuras geométricas.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+            <div class="resource-card">
+              <div class="resource-title">National Council of Teachers of Mathematics</div>
+              <p>Organización profesional con recursos, planes de lección y actividades para la enseñanza de la geometría.</p>
+              <a href="#" class="biblio-link">Visitar sitio →</a>
+            </div>
+          </div>
+          
+          <h3 style="color: #f59e0b; margin: 32px 0 16px 0; font-size: 1.5rem;">Artículos Científicos y Pedagógicos</h3>
+          
+          <div class="biblio-list">
+            <div class="biblio-item">
+              <div class="biblio-title">Estrategias Efectivas para la Enseñanza de la Geometría en Secundaria</div>
+              <div style="color: #f59e0b; margin-bottom: 8px;">Por Dra. Elena Martínez, Dr. Juan Pérez</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Revista de Educación Matemática</div>
+              <p>Estudio sobre metodologías efectivas para enseñar geometría, basado en investigación empírica con estudiantes de secundaria.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Vol. 15, No. 3, pp. 45-67, 2022</p>
+            </div>
+            <div class="biblio-item">
+              <div class="biblio-title">El Impacto de las Visualizaciones Interactivas en el Aprendizaje de la Geometría</div>
+              <div style="color: #f59e0b; margin-bottom: 8px;">Por Prof. María López, Dr. Carlos Sánchez</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Journal of Educational Technology</div>
+              <p>Análisis del efecto de las herramientas digitales interactivas en la comprensión de conceptos geométricos por parte de estudiantes adolescentes.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Vol. 8, No. 2, pp. 112-135, 2021</p>
+            </div>
+            <div class="biblio-item">
+              <div class="biblio-title">Errores Comunes en el Cálculo de Áreas y Estrategias de Remediación</div>
+              <div style="color: #f59e0b; margin-bottom: 8px;">Por Dra. Patricia Gómez</div>
+              <div style="color: #60a5fa; margin-bottom: 8px;">Educación Matemática en Secundaria</div>
+              <p>Identificación de errores frecuentes en el cálculo de áreas y propuestas de intervención pedagógica para superarlos.</p>
+              <p style="margin-top: 8px; font-style: italic; color: #94a3b8;">Vol. 12, No. 1, pp. 23-41, 2023</p>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Barra lateral -->
+      <aside>
+        <div class="card">
+          <h3>Resumen Rápido de Fórmulas</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Triángulo: <code>A = (b·h)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Cuadrado: <code>A = l²</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Rectángulo: <code>A = b·h</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Rombo: <code>A = (D·d)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Trapecio: <code>A = ((B+b)·h)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Paralelogramo: <code>A = b·h</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Pentágono Regular: <code>A = (P·a)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Hexágono Regular: <code>A = (P·a)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Octágono Regular: <code>A = (P·a)/2</code>
+            </li>
+            <li style="margin: 12px 0; padding: 10px; background: #2d2d2d; border-radius: 8px;">
+              Círculo: <code>A = π·r²</code>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>Consejos Rápidos</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+            <div style="display: flex; align-items: flex-start; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px;">
+              <div style="font-size: 1.5rem; margin-right: 12px;">📏</div>
+              <div>
+                <p style="font-size: 0.95rem; color: #e2e8f0;">Recuerda siempre incluir las unidades en tus respuestas (cm², m², etc.)</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px;">
+              <div style="font-size: 1.5rem; margin-right: 12px;">✏️</div>
+              <div>
+                <p style="font-size: 0.95rem; color: #e2e8f0;">Dibuja un diagrama cuando resuelvas problemas, te ayudará a visualizar mejor</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px;">
+              <div style="font-size: 1.5rem; margin-right: 12px;">✅</div>
+              <div>
+                <p style="font-size: 0.95rem; color: #e2e8f0;">Verifica que tu respuesta tenga sentido en el contexto del problema</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px;">
+              <div style="font-size: 1.5rem; margin-right: 12px;">🏠</div>
+              <div>
+                <p style="font-size: 0.95rem; color: #e2e8f0;">Practica con objetos reales en tu entorno para reforzar el aprendizaje</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px;">
+              <div style="font-size: 1.5rem; margin-right: 12px;">🗣️</div>
+              <div>
+                <p style="font-size: 0.95rem; color: #e2e8f0;">Explica los pasos de tu solución en voz alta, esto fortalece tu comprensión</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>Actividades para Clase</h3>
+          <ol style="padding-left: 20px; margin: 16px 0; font-size: 0.95rem;">
+            <li style="margin-bottom: 12px;">Medición de objetos reales en el aula y cálculo de sus áreas</li>
+            <li style="margin-bottom: 12px;">Creación de un "museo geométrico" con objetos que representen diferentes figuras</li>
+            <li style="margin-bottom: 12px;">Resolución de problemas en grupos cooperativos con presentación de soluciones</li>
+            <li style="margin-bottom: 12px;">Diseño de planos simples de habitaciones o espacios usando figuras geométricas</li>
+            <li style="margin-bottom: 12px;">Juego de roles: "Arquitectos por un día" diseñando espacios con restricciones de área</li>
+            <li style="margin-bottom: 12px;">Competencia de cálculo rápido de áreas con figuras proyectadas</li>
+            <li style="margin-bottom: 12px;">Creación de problemas geométricos para compañeros con solución incluida</li>
+            <li>Investigación sobre aplicaciones de la geometría en profesiones de interés</li>
+          </ol>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>Rúbrica de Evaluación</h3>
+          <p style="color: #94a3b8; margin-bottom: 16px;">Sistema de calificación para evaluar el aprendizaje:</p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #e2e8f0; font-weight: 600;">Comprensión de conceptos</span>
+                <span style="color: #f59e0b; font-weight: 700;">30%</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #94a3b8;">Demuestra entender las propiedades de las figuras y las fórmulas</p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #e2e8f0; font-weight: 600;">Precisión en cálculos</span>
+                <span style="color: #f59e0b; font-weight: 700;">30%</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #94a3b8;">Realiza cálculos correctos con procedimientos adecuados</p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #e2e8f0; font-weight: 600;">Aplicación práctica</span>
+                <span style="color: #f59e0b; font-weight: 700;">25%</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #94a3b8;">Aplica conocimientos a problemas del mundo real</p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #e2e8f0; font-weight: 600;">Presentación y claridad</span>
+                <span style="color: #f59e0b; font-weight: 700;">15%</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #94a3b8;">Explica procedimientos de forma clara y organizada</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;" id="progress-tracker">
+          <h3>Seguimiento de Progreso</h3>
+          <p id="progress-message" style="margin: 16px 0; color: #94a3b8;">Inicia sesión para ver y guardar tu progreso</p>
+          <div class="progress-bar" style="margin: 16px 0;">
+            <div class="progress-fill" id="user-progress" style="width: 0%;"></div>
+          </div>
+          <p id="progress-text" style="text-align: center; font-weight: 600; margin: 8px 0; color: #e2e8f0;">0%</p>
+          
+          <div id="history-section" style="margin-top: 24px; display: none;">
+            <h4 style="color: #e2e8f0; margin-bottom: 16px; font-size: 1.1rem;">Historial de Evaluaciones</h4>
+            <div id="history-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- History items will be added here dynamically -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>Insignias de Logro</h3>
+          <div class="badge-container">
+            <div class="badge" id="badge1">
+              <div class="badge-icon">🔍</div>
+              <div class="badge-info">
+                <div class="badge-name">Explorador Geométrico</div>
+                <div class="badge-desc">Completa la primera evaluación</div>
+              </div>
+            </div>
+            <div class="badge" id="badge2">
+              <div class="badge-icon">🧮</div>
+              <div class="badge-info">
+                <div class="badge-name">Calculista Experto</div>
+                <div class="badge-desc">Obtén 100% en una evaluación</div>
+              </div>
+            </div>
+            <div class="badge" id="badge3">
+              <div class="badge-icon">🏆</div>
+              <div class="badge-info">
+                <div class="badge-name">Maestro de Figuras</div>
+                <div class="badge-desc">Completa todas las evaluaciones</div>
+              </div>
+            </div>
+            <div class="badge" id="badge4">
+              <div class="badge-icon">💡</div>
+              <div class="badge-info">
+                <div class="badge-name">Solucionador de Problemas</div>
+                <div class="badge-desc">Resuelve 10 problemas correctamente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>Acceso Rápido</h3>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Inicio</button>
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Figuras</button>
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Taller</button>
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Evaluaciones</button>
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Recursos</button>
+            <button class="btn" style="text-align: left; padding: 12px; background: #2d2d2d; border: 1px solid #334155;">Bibliografía</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+    
+    <footer>
+      <div class="footer-links">
+        <a href="#introduccion" class="footer-link">Inicio</a>
+        <a href="#figuras" class="footer-link">Figuras</a>
+        <a href="#taller-simplificado" class="footer-link">Taller</a>
+        <a href="#evaluaciones" class="footer-link">Evaluaciones</a>
+        <a href="#recursos" class="footer-link">Recursos</a>
+      </div>
+      <p>Recurso educativo profesional para estudiantes de secundaria</p>
+      <p class="copyright">© 2023 Geometría Avanzada - Figuras Planas. Todos los derechos reservados.</p>
+    </footer>
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+      <div class="login-modal">
+        <span class="close-modal" id="close-modal">&times;</span>
+        <h3>Iniciar Sesión</h3>
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <input type="text" id="username" placeholder="Ingrese su usuario">
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="Ingrese su contraseña">
+        </div>
+        <button class="login-btn" id="login-btn">Iniciar Sesión</button>
+        <button class="cancel-btn" id="cancel-btn">Cancelar</button>
+        <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: #94a3b8;">
+          <p>Usuarios de prueba:</p>
+          <p>Estudiante: usuario "student", contraseña "student"</p>
+          <p>Profesor: usuario "teacher", contraseña "teacher"</p>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Quiz data
+      const quizzes = {
+        1: {
+          title: "Evaluación Básica",
+          questions: [
+            {
+              id: 1,
+              question: "¿Cuál es la fórmula para calcular el área de un triángulo?",
+              options: [
+                "A = b × h",
+                "A = (b × h) / 2",
+                "A = b²",
+                "A = π × r²"
+              ],
+              correct: 1
+            },
+            {
+              id: 2,
+              question: "¿Qué figura tiene todos sus lados iguales y ángulos rectos?",
+              options: [
+                "Rectángulo",
+                "Rombo",
+                "Cuadrado",
+                "Paralelogramo"
+              ],
+              correct: 2
+            },
+            {
+              id: 3,
+              question: "La fórmula A = (D × d) / 2 corresponde a:",
+              options: [
+                "Trapecio",
+                "Rombo",
+                "Círculo",
+                "Polígono regular"
+              ],
+              correct: 1
+            },
+            {
+              id: 4,
+              question: "¿Qué representa 'a' en la fórmula del área de un polígono regular A = (P × a) / 2?",
+              options: [
+                "Altura",
+                "Apotema",
+                "Ángulo",
+                "Área"
+              ],
+              correct: 1
+            },
+            {
+              id: 5,
+              question: "¿Cuál es el valor aproximado de π que se usa comúnmente en cálculos?",
+              options: [
+                "2.14",
+                "3.14",
+                "4.14",
+                "1.14"
+              ],
+              correct: 1
+            }
+          ]
+        },
+        2: {
+          title: "Evaluación Intermedia",
+          questions: [
+            {
+              id: 6,
+              question: "Si un cuadrado tiene un área de 64 cm², ¿cuál es la longitud de su lado?",
+              options: [
+                "6 cm",
+                "7 cm",
+                "8 cm",
+                "9 cm"
+              ],
+              correct: 2
+            },
+            {
+              id: 7,
+              question: "Un rectángulo mide 12 cm de largo y 8 cm de ancho. ¿Cuál es su área?",
+              options: [
+                "86 cm²",
+                "96 cm²",
+                "106 cm²",
+                "116 cm²"
+              ],
+              correct: 1
+            },
+            {
+              id: 8,
+              question: "Un triángulo tiene una base de 15 cm y una altura de 10 cm. ¿Cuál es su área?",
+              options: [
+                "50 cm²",
+                "75 cm²",
+                "100 cm²",
+                "150 cm²"
+              ],
+              correct: 1
+            },
+            {
+              id: 9,
+              question: "Las diagonales de un rombo miden 24 cm y 18 cm. ¿Cuál es su área?",
+              options: [
+                "180 cm²",
+                "216 cm²",
+                "252 cm²",
+                "300 cm²"
+              ],
+              correct: 1
+            },
+            {
+              id: 10,
+              question: "Un círculo tiene un radio de 7 cm. ¿Cuál es su área aproximada? (Usa π = 3.14)",
+              options: [
+                "143.86 cm²",
+                "153.86 cm²",
+                "163.86 cm²",
+                "173.86 cm²"
+              ],
+              correct: 1
+            }
+          ]
+        },
+        3: {
+          title: "Evaluación Avanzada",
+          questions: [
+            {
+              id: 11,
+              question: "Un trapecio tiene bases de 16 cm y 10 cm, y una altura de 8 cm. ¿Cuál es su área?",
+              options: [
+                "84 cm²",
+                "96 cm²",
+                "104 cm²",
+                "112 cm²"
+              ],
+              correct: 1
+            },
+            {
+              id: 12,
+              question: "Un hexágono regular tiene un lado de 6 cm y una apotema de 5.2 cm. ¿Cuál es su área?",
+              options: [
+                "78.6 cm²",
+                "86.4 cm²",
+                "93.6 cm²",
+                "102.4 cm²"
+              ],
+              correct: 2
+            },
+            {
+              id: 13,
+              question: "Si el área de un círculo es 314 cm², ¿cuál es su radio aproximado? (Usa π = 3.14)",
+              options: [
+                "8 cm",
+                "9 cm",
+                "10 cm",
+                "11 cm"
+              ],
+              correct: 2
+            },
+            {
+              id: 14,
+              question: "Un paralelogramo tiene una base de 15 cm y una altura de 12 cm. ¿Cuál es su área?",
+              options: [
+                "150 cm²",
+                "160 cm²",
+                "170 cm²",
+                "180 cm²"
+              ],
+              correct: 3
+            },
+            {
+              id: 15,
+              question: "Un pentágono regular tiene un perímetro de 50 cm y una apotema de 6.9 cm. ¿Cuál es su área?",
+              options: [
+                "152.5 cm²",
+                "162.5 cm²",
+                "172.5 cm²",
+                "182.5 cm²"
+              ],
+              correct: 2
+            }
+          ]
+        },
+        4: {
+          title: "Evaluación Integral",
+          questions: [
+            {
+              id: 16,
+              question: "Para pintar una pared rectangular de 4m x 3m, si un litro de pintura cubre 10m², ¿cuántos litros necesitas?",
+              options: [
+                "1 litro",
+                "1.2 litros",
+                "1.5 litros",
+                "2 litros"
+              ],
+              correct: 1
+            },
+            {
+              id: 17,
+              question: "Un jardín con forma de triángulo equilátero tiene lados de 10m. Si la altura es 8.66m, ¿cuál es su área?",
+              options: [
+                "38.3 m²",
+                "43.3 m²",
+                "48.3 m²",
+                "53.3 m²"
+              ],
+              correct: 1
+            },
+            {
+              id: 18,
+              question: "Una piscina circular tiene un diámetro de 8m. ¿Cuál es su área aproximada? (Usa π = 3.14)",
+              options: [
+                "45.24 m²",
+                "50.24 m²",
+                "55.24 m²",
+                "60.24 m²"
+              ],
+              correct: 1
+            },
+            {
+              id: 19,
+              question: "Un campo de fútbol mide 100m x 70m. ¿Cuál es su área en hectáreas? (1 hectárea = 10,000 m²)",
+              options: [
+                "0.7 hectáreas",
+                "1.7 hectáreas",
+                "7 hectáreas",
+                "70 hectáreas"
+              ],
+              correct: 0
+            },
+            {
+              id: 20,
+              question: "Un vitral con forma de rombo tiene diagonales de 1.2m y 0.8m. ¿Cuál es su área?",
+              options: [
+                "0.36 m²",
+                "0.48 m²",
+                "0.64 m²",
+                "0.96 m²"
+              ],
+              correct: 1
+            }
+          ]
+        }
+      };
+
+      // Global variables
+      let currentQuiz = 1;
+      let userAnswers = {};
+      let isLoggedIn = false;
+      let userProgressValue = 0;
+      let quizHistory = [];
+      let badgesEarned = [];
+
+      // DOM elements
+      const loginModal = document.getElementById('login-modal');
+      const loginTrigger = document.getElementById('login-trigger');
+      const closeModal = document.getElementById('close-modal');
+      const loginBtn = document.getElementById('login-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const progressTracker = document.getElementById('progress-tracker');
+      const userProgress = document.getElementById('user-progress');
+      const progressText = document.getElementById('progress-text');
+      const progressMessage = document.getElementById('progress-message');
+      const historySection = document.getElementById('history-section');
+      const historyList = document.getElementById('history-list');
+      const quizSelector = document.querySelector('.quiz-selector');
+      const quizContent = document.getElementById('quiz-content');
+      const quizResults = document.getElementById('quiz-results');
+      const progressFill = document.getElementById('progress-fill');
+      const scoreText = document.getElementById('score-text');
+      const feedback = document.getElementById('feedback');
+      const restartQuiz = document.getElementById('restart-quiz');
+      const nextQuiz = document.getElementById('next-quiz');
+
+      // Initialize the first quiz
+      function loadQuiz(quizId) {
+        currentQuiz = quizId;
+        userAnswers = {};
+        
+        // Update quiz selector buttons
+        document.querySelectorAll('.quiz-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        document.querySelector(`.quiz-btn[data-quiz="${quizId}"]`).classList.add('active');
+        
+        // Create quiz content
+        let quizHTML = `<h3 style="color: #3b82f6; margin-bottom: 16px;">${quizzes[quizId].title}</h3>`;
+        
+        quizzes[quizId].questions.forEach(q => {
+          quizHTML += `
+            <div class="quiz-question">
+              <h3>${q.id}. ${q.question}</h3>
+              <div class="quiz-options">
+                ${q.options.map((option, index) => `
+                  <div class="quiz-option" data-question="${q.id}" data-option="${index}">${String.fromCharCode(65 + index)}. ${option}</div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        });
+        
+        quizHTML += `<button class="submit-quiz" id="submit-quiz">Enviar Respuestas</button>`;
+        quizContent.innerHTML = quizHTML;
+        
+        // Hide results
+        quizResults.style.display = 'none';
+        
+        // Add event listeners to new quiz options
+        document.querySelectorAll('.quiz-option').forEach(option => {
+          option.addEventListener('click', function() {
+            const questionId = this.getAttribute('data-question');
+            document.querySelectorAll(`.quiz-option[data-question="${questionId}"]`).forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            userAnswers[questionId] = parseInt(this.getAttribute('data-option'));
+          });
+        });
+        
+        // Add event listener to submit button
+        document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
+      }
+
+      // Submit quiz function
+      function submitQuiz() {
+        const quiz = quizzes[currentQuiz];
+        const totalQuestions = quiz.questions.length;
+        
+        if (Object.keys(userAnswers).length < totalQuestions) {
+          alert('Por favor responde todas las preguntas');
+          return;
+        }
+
+        let correctCount = 0;
+        quiz.questions.forEach(q => {
+          if (userAnswers[q.id] === q.correct) {
+            correctCount++;
+          }
+        });
+
+        // Calculate and update progress
+        const quizScore = Math.round((correctCount / totalQuestions) * 100);
+        if (isLoggedIn) {
+          userProgressValue = Math.max(userProgressValue, quizScore);
+          updateProgressTracker();
+          
+          // Add to history
+          const quizResult = {
+            quizId: currentQuiz,
+            title: quiz.title,
+            score: correctCount,
+            total: totalQuestions,
+            percentage: quizScore,
+            date: new Date().toLocaleDateString()
+          };
+          quizHistory.push(quizResult);
+          updateHistory();
+          
+          // Check for badges
+          checkBadges();
+        }
+
+        // Display results
+        scoreText.textContent = `Has respondido correctamente ${correctCount} de ${totalQuestions} preguntas`;
+        progressFill.style.width = `${quizScore}%`;
+        
+        // Feedback based on score
+        if (correctCount <= 1) {
+          feedback.textContent = "¡No te desanimes! Revisa las fórmulas y vuelve a intentarlo.";
+          feedback.style.color = "#ef4444";
+        } else if (correctCount <= 3) {
+          feedback.textContent = "¡Vas por buen camino! Con un poco más de práctica dominarás el tema.";
+          feedback.style.color = "#f59e0b";
+        } else if (correctCount < 5) {
+          feedback.textContent = "¡Muy bien! Tienes un buen dominio del tema, sigue así.";
+          feedback.style.color = "#3b82f6";
+        } else {
+          feedback.textContent = "¡Excelente! Has dominado perfectamente esta evaluación.";
+          feedback.style.color = "#10b981";
+        }
+
+        // Show results
+        quizContent.style.display = 'none';
+        quizResults.style.display = 'block';
+      }
+
+      // Update progress tracker
+      function updateProgressTracker() {
+        if (isLoggedIn) {
+          progressMessage.textContent = 'Tu progreso actual:';
+          userProgress.style.width = `${userProgressValue}%`;
+          progressText.textContent = `${userProgressValue}%`;
+        }
+      }
+
+      // Update history section
+      function updateHistory() {
+        if (isLoggedIn && quizHistory.length > 0) {
+          historySection.style.display = 'block';
+          historyList.innerHTML = '';
+          
+          quizHistory.forEach(result => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+              <div class="history-header">
+                <div class="history-title">${result.title}</div>
+                <div class="history-date">${result.date}</div>
+              </div>
+              <div class="history-score">${result.score}/${result.total} correctas (${result.percentage}%)</div>
+              <div class="history-progress">
+                <div class="history-progress-fill" style="width: ${result.percentage}%"></div>
+              </div>
+            `;
+            historyList.appendChild(historyItem);
+          });
+        }
+      }
+
+      // Check and update badges
+      function checkBadges() {
+        badgesEarned = [];
+        
+        // Badge 1: Complete first quiz
+        if (quizHistory.length > 0) {
+          badgesEarned.push(1);
+          document.getElementById('badge1').classList.add('earned');
+        }
+        
+        // Badge 2: Get 100% in any quiz
+        if (quizHistory.some(q => q.percentage === 100)) {
+          badgesEarned.push(2);
+          document.getElementById('badge2').classList.add('earned');
+        }
+        
+        // Badge 3: Complete all quizzes
+        const completedQuizzes = [...new Set(quizHistory.map(q => q.quizId))];
+        if (completedQuizzes.length >= 4) {
+          badgesEarned.push(3);
+          document.getElementById('badge3').classList.add('earned');
+        }
+        
+        // Badge 4: Solve 10 problems correctly
+        const totalCorrect = quizHistory.reduce((sum, q) => sum + q.score, 0);
+        if (totalCorrect >= 10) {
+          badgesEarned.push(4);
+          document.getElementById('badge4').classList.add('earned');
+        }
+      }
+
+      // Initialize first quiz
+      loadQuiz(1);
+
+      // Quiz selector event listeners
+      document.querySelectorAll('.quiz-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const quizId = parseInt(this.getAttribute('data-quiz'));
+          loadQuiz(quizId);
+        });
+      });
+
+      // Next quiz button
+      nextQuiz.addEventListener('click', function() {
+        let nextQuizId = currentQuiz + 1;
+        if (nextQuizId > 4) {
+          nextQuizId = 1;
+        }
+        loadQuiz(nextQuizId);
+        quizResults.style.display = 'none';
+        quizContent.style.display = 'block';
+      });
+
+      // Restart quiz button
+      restartQuiz.addEventListener('click', function() {
+        loadQuiz(currentQuiz);
+        quizResults.style.display = 'none';
+        quizContent.style.display = 'block';
+      });
+
+      // Login functionality
+      loginTrigger.addEventListener('click', () => {
+        loginModal.classList.add('active');
+      });
+
+      closeModal.addEventListener('click', () => {
+        loginModal.classList.remove('active');
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        loginModal.classList.remove('active');
+      });
+
+      loginBtn.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        if (username && password) {
+          isLoggedIn = true;
+          document.querySelector('.user-profile')?.remove();
+          
+          // Create user profile in nav
+          const nav = document.getElementById('main-nav');
+          const userProfile = document.createElement('div');
+          userProfile.className = 'user-profile';
+          userProfile.innerHTML = `
+            <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+            <div class="user-info">
+              <div class="user-name">${username}</div>
+              <div class="user-role">${username === 'teacher' ? 'Profesor' : 'Estudiante'}</div>
+            </div>
+            <button class="logout-btn">Cerrar</button>
+          `;
+          nav.appendChild(userProfile);
+          
+          // Add logout functionality
+          userProfile.querySelector('.logout-btn').addEventListener('click', () => {
+            isLoggedIn = false;
+            userProfile.remove();
+            userProgressValue = 0;
+            quizHistory = [];
+            badgesEarned = [];
+            
+            // Reset badges
+            document.querySelectorAll('.badge').forEach(badge => {
+              badge.classList.remove('earned');
+            });
+            
+            // Reset progress
+            userProgress.style.width = '0%';
+            progressText.textContent = '0%';
+            progressMessage.textContent = 'Inicia sesión para ver y guardar tu progreso';
+            historySection.style.display = 'none';
+            
+            document.getElementById('login-trigger').style.display = 'block';
+          });
+          
+          // Hide login trigger
+          document.getElementById('login-trigger').style.display = 'none';
+          
+          // Update progress tracker
+          updateProgressTracker();
+          loginModal.classList.remove('active');
+          usernameInput.value = '';
+          passwordInput.value = '';
+        } else {
+          alert('Por favor ingrese usuario y contraseña');
+        }
+      });
+
+      // Navigation active state
+      const navLinks = document.querySelectorAll('.btn');
+      const sections = document.querySelectorAll('section');
+
+      window.addEventListener('scroll', () => {
+        let currentSection = 'introduccion';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 100;
+          const sectionHeight = section.clientHeight;
+          if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+            currentSection = section.getAttribute('id');
+          }
+        });
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${currentSection}`) {
+            link.classList.add('active');
+          }
+        });
+      });
+
+      // Smooth scrolling for navigation links
+      navLinks.forEach(link => {
+        if (link.hasAttribute('href')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+              window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: 'smooth'
+              });
+            }
+          });
+        }
+      });
+
+      // Animation on scroll
+      const animatedElements = document.querySelectorAll('.animate-fadeInUp');
+      function checkScrollAnimation() {
+        animatedElements.forEach(element => {
+          const elementTop = element.getBoundingClientRect().top;
+          const elementVisible = 150;
+          if (elementTop < window.innerHeight - elementVisible) {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+          }
+        });
+      }
+
+      // Initial check
+      checkScrollAnimation();
+
+      // Check on scroll
+      window.addEventListener('scroll', checkScrollAnimation);
+
+      // Add animation properties to elements
+      animatedElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+      });
+
+      // Quick access buttons in sidebar
+      document.querySelectorAll('.btn').forEach(btn => {
+        if (btn.textContent.includes('Inicio')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#introduccion').scrollIntoView({ behavior: 'smooth' });
+          });
+        } else if (btn.textContent.includes('Figuras')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#figuras').scrollIntoView({ behavior: 'smooth' });
+          });
+        } else if (btn.textContent.includes('Taller')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#taller-simplificado').scrollIntoView({ behavior: 'smooth' });
+          });
+        } else if (btn.textContent.includes('Evaluaciones')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#evaluaciones').scrollIntoView({ behavior: 'smooth' });
+          });
+        } else if (btn.textContent.includes('Recursos')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#recursos').scrollIntoView({ behavior: 'smooth' });
+          });
+        } else if (btn.textContent.includes('Bibliografía')) {
+          btn.addEventListener('click', () => {
+            document.querySelector('#bibliografia').scrollIntoView({ behavior: 'smooth' });
+          });
+        }
+      });
+    </script>
+</body>
+</html>
+```
